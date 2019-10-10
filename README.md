@@ -1,2 +1,2 @@
-# SistemasDistribuidos
-Repositório para os projetos implementados no curso de Sistemas Distribuidos
+# Distributed Systems
+Repository for the projects implemented during the course of Distributed Systems 
