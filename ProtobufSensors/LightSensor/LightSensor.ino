@@ -14,6 +14,7 @@
 // Defines
 #define send_time_ms 10000
 #define sensor_type Sensor_SensorType_LIGHT
+#define sensor_id    1
 
 unsigned long count_time;
 
@@ -24,13 +25,13 @@ char led_pin = 12;
 const char* ssid     = "NETWORK SSID";
 const char* password = "NETWORK PASS";
 
-const char* server_ip     = "192.168.15.8";
+const char* server_ip     = "192.168.15.5";
 const uint16_t server_port  = 7777;
 
 const uint16_t local_port  = 8888;
 
 uint8_t receive_buffer[UDP_TX_PACKET_MAX_SIZE + 1];
-char transmit_buffer[128];
+char transmit_buffer[CommandMessage_size];
 
 Sensor sensor = Sensor_init_zero;
 CommandMessage msg = CommandMessage_init_zero;
@@ -39,7 +40,7 @@ pb_ostream_t stream_o = pb_ostream_from_buffer((uint8_t*)transmit_buffer, sizeof
 pb_istream_t stream_i = pb_istream_from_buffer(receive_buffer, sizeof(receive_buffer));
 
 void set_state(float state){
-  if(sensor.type == sensor_type){
+  if(sensor.type == Sensor_SensorType_LIGHT){
     
     if(state == 1.0){
       digitalWrite(led_pin, HIGH);
@@ -66,11 +67,11 @@ void send_state(){
   msg.parameter = sensor;
 
   // Encode the message
-  pb_encode(&stream_o, CommandMessage_fields, &msg);
+  pb_encode_delimited(&stream_o, CommandMessage_fields, &msg);
 
   // Send a reply, to the IP address and port that sent us the packet we received
   Udp.beginPacket(server_ip, server_port);
-  Udp.write(transmit_buffer);
+  Udp.write(transmit_buffer, CommandMessage_size);
   Udp.endPacket();
   
 }
@@ -84,8 +85,8 @@ void setup() {
   pinMode(led_pin, OUTPUT);
   digitalWrite(led_pin, LOW);
   
-  sensor.type = Sensor_SensorType_LIGHT;
-  sensor.id = 1;
+  sensor.type = sensor_type;
+  sensor.id = sensor_id;
   sensor.state = 0;
 
   WiFi.mode(WIFI_STA);
