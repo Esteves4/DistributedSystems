@@ -23,15 +23,15 @@ WiFiUDP Udp;
 char led_pin = 12;
 char ldr_pin = A0;
 
-const char* ssid     = "NETWORK SSID";
-const char* password = "NETWORK PASS";
+const char* ssid     = "LUCAS-ESTEVES";
+const char* password = "8zA008^1";
 
-const char* server_ip     = "192.168.15.5";
+const char* server_ip     = "192.168.137.1";
 const uint16_t server_port  = 7777;
 
 const uint16_t local_port  = 8888;
 
-uint8_t receive_buffer[UDP_TX_PACKET_MAX_SIZE + 1];
+uint8_t receive_buffer[CommandMessage_size];
 char transmit_buffer[CommandMessage_size];
 
 Sensor sensor = Sensor_init_zero;
@@ -55,7 +55,7 @@ void set_state(float state){
 
 float get_state(){
 
-  return analogRead(ldr_pin);
+  return map(analogRead(ldr_pin), 0, 1024, 100, 0);
 }
 
 void send_state(){
@@ -67,12 +67,15 @@ void send_state(){
   msg.has_parameter =  true;
   msg.parameter = sensor;
 
+   // Reset stream
+  stream_o = pb_ostream_from_buffer((uint8_t*)transmit_buffer, sizeof(transmit_buffer));
+  
   // Encode the message
-  pb_encode_delimited(&stream_o, CommandMessage_fields, &msg); 
+  pb_encode(&stream_o, CommandMessage_fields, &msg); 
 
   // Send a reply, to the IP address and port that sent us the packet we received
   Udp.beginPacket(server_ip, server_port);
-  Udp.write(transmit_buffer, CommandMessage_size);
+  Udp.write(transmit_buffer, stream_o.bytes_written);
   Udp.endPacket();
   
 }
@@ -123,13 +126,13 @@ void loop() {
     if(decoded){
     
       if(msg.command == CommandMessage_CommandType_GET_STATE){
-
+        Serial.println("Sending state...");
         send_state();
                 
       }else if(msg.command == CommandMessage_CommandType_SET_STATE){
 
         if(msg.has_parameter){
-
+          Serial.println("Setting state...");
           set_state(msg.parameter.state);
           
         }
@@ -137,7 +140,7 @@ void loop() {
     }
   }else if(millis() - count_time > send_time_ms){
     count_time = millis();
-
+    Serial.println("Sending state...");
     send_state();
   }
 }
