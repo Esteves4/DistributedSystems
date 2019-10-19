@@ -14,7 +14,7 @@
 // Defines
 #define send_time_ms 10000
 #define sensor_type Sensor_SensorType_LUMINOSITY
-#define sensor_id    1
+#define sensor_id    3
 
 unsigned long count_time;
 
