@@ -12,7 +12,7 @@
 #include <WiFiUdp.h>
 
 // Defines
-#define send_time_ms 10000
+#define send_time_ms 20000
 #define sensor_type  Sensor_SensorType_TEMPERATURE
 #define sensor_id    2
 
