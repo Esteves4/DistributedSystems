@@ -6,6 +6,7 @@ message Sensor {
 		TEMPERATURE = 0;
 		LIGHT = 1;
 		LUMINOSITY = 2;
+		GAS = 3;
 	}
 
 	required SensorType type = 1;
