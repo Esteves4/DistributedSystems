@@ -14,7 +14,7 @@
 // Defines
 #define send_time_ms 20000
 #define sensor_type  Sensor_SensorType_GAS
-#define sensor_id    3
+#define sensor_id    4
 
 unsigned long count_time;
 
@@ -70,7 +70,7 @@ void send_state(){
   stream_o = pb_ostream_from_buffer((uint8_t*)transmit_buffer, sizeof(transmit_buffer));
 
   // Encode the message
-  pb_encode(&stream_o, CommandMessage_fields, &msg); 
+  pb_encode(&stream_o, CommandMessage_fields, &msg);
 
   // Send a reply, to the IP address and port that sent us the packet we received
   Udp.beginPacket(server_ip, server_port);
